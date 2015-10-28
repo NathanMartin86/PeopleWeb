@@ -1,6 +1,13 @@
+import spark.ModelAndView;
+import spark.Session;
+import spark.Spark;
+import spark.template.mustache.MustacheTemplateEngine;
+
 import java.io.File;
 import java.io.FileReader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by zach on 10/19/15.
@@ -19,10 +26,49 @@ public class People {
             String[] columns = line.split(",");
             Person person = new Person(Integer.valueOf(columns[0]), columns[1], columns[2], columns[3], columns[4], columns[5]);
             people.add(person);
-        }
-
-        // write Spark route here
     }
+        // write Spark route
+        Spark.get(
+                "/",
+            ((request, response) -> {
+                String offset = request.queryParams("offset");
+                int offsetNum;
+                if(offset == null){
+                    offsetNum = 0;
+                }else{
+                    offsetNum = Integer.valueOf(offset);
+                }
+                ArrayList<Person> temp = new ArrayList (people.subList(offsetNum,offsetNum+20));
+
+
+                HashMap m = new HashMap();
+                m.put("people", temp);
+                m.put("newOffset",offsetNum+20);
+
+                return new ModelAndView(m, "people.html");
+            }),
+                new MustacheTemplateEngine()
+        );
+
+        Spark.get(
+                "/person",
+                ((request, response) -> {
+                    HashMap x = new HashMap();
+                    String id = request.queryParams("id");
+
+                    try {
+                        int idNum = Integer.valueOf(id);
+                        Person person = people.get(idNum - 1);
+                        x.put("person", person);
+                    }catch (Exception e) {
+                    }
+                    return new ModelAndView(x,"person.html");
+                }),
+                new MustacheTemplateEngine()
+        );
+
+    }
+
 
     static String readFile(String fileName) {
         File f = new File(fileName);
@@ -37,3 +83,7 @@ public class People {
         }
     }
 }
+
+//String offset = request.queryParams("offset");
+// int offset Num;
+//if offset num, offsetNum = 0
