@@ -1,9 +1,9 @@
 <html>
 <body>
 {{#people}}
-<a href="person?id={{id}}">{{firstName}}{{lastName}}info</a> <br>
+<a href="person?id={{id}}">{{firstName}}{{lastName}}</a> <br>
 {{/people}}
-
+<a href="/?offset={{oldOffset}}">Previous</a>
 <a href = "/?offset={{newOffset}}">Next</a>
 </body>
 </html>
